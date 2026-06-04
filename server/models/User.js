@@ -1,5 +1,5 @@
-const mongoose = require("mongoose"); //ייבוא של ספריית מונגוס
-const bcrypt = require("bcrypt"); //ייבוא של ספריית בכרויפט שמשמשת להצפנה HASH
+const mongoose = require("mongoose"); 
+const bcrypt = require("bcrypt"); 
 
 // Define the structure of a user document
 const userSchema = new mongoose.Schema( 
@@ -22,8 +22,8 @@ const userSchema = new mongoose.Schema(
     email: {
       type: String,
       required: true,
-      unique: true, // לא יכולות להיות שתי סיסמאות זהות
-      lowercase: true, //אם סיסמה נכתבת עם אותיות גדולות באנגלית הכול הופך לאותיות קטנות
+      unique: true, 
+      lowercase: true, 
       trim: true
     },
 
@@ -31,10 +31,9 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true,
-      minlength: 6, //אורך הסיסמה המינימלי הוא 6 תווים
-      select: false //כאשר נשלוף ממסד הנתונים משתמשים, הסיסמה לא תחזור אוטומטית לכל שליפה
+      minlength: 6, 
+      select: false 
     },
-
 
     // User role inside the lab system
     role: {
@@ -66,14 +65,13 @@ const userSchema = new mongoose.Schema(
 );
 
 // Hash password before saving the 
-// לפני שמירת הסיסמה במסד הנתונים, יש לבצע פעולת הצפנה
 userSchema.pre("save", async function (next) {
   // Only hash the password if it was created or modified
   if (!this.isModified("password")) { 
     return next();
   }
 
-  // Generate salt and hash the passwordתהליך הצפנה  
+  // Generate salt and hash the password
   const salt = await bcrypt.genSalt(12);
   this.password = await bcrypt.hash(this.password, salt);
 
