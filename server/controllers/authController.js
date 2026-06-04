@@ -65,6 +65,49 @@ const registerUser = async (req, res) => {
   }
 };
 
+// Login user
+const loginUser = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // NEW: Find user by email and include password field
+    const user = await User.findOne({ email }).select("+password");
+
+    // NEW: Check if user exists
+    if (!user) {
+      return res.status(401).json({
+        message: "Invalid email or password"
+      });
+    }
+
+    // NEW: Check if password is correct
+    const isMatch = await user.matchPassword(password);
+
+    if (!isMatch) {
+      return res.status(401).json({
+        message: "Invalid email or password"
+      });
+    }
+
+    // NEW: Login successful - return user and token
+    res.status(200).json({
+      _id: user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      role: user.role,
+      labPosition: user.labPosition,
+      token: generateToken(user._id)
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      message: error.message
+    });
+  }
+};
+
 module.exports = {
-  registerUser
+  registerUser,
+  loginUser
 };
