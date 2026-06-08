@@ -3,39 +3,48 @@ const User = require("../models/User");
 
 // Protect routes
 const protect = async (req, res, next) => {
-  try {
-    let token;
+  let token;
 
-    if (
-      req.headers.authorization &&
-      req.headers.authorization.startsWith("Bearer")
-    ) {
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    try {
       token = req.headers.authorization.split(" ")[1];
 
-      // Verify token and decode payload
-      const decoded = jwt.verify(
-        token,
-        process.env.JWT_SECRET
-      );
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-      // NEW: Find user by decoded id
-      req.user = await User.findById(decoded.id).select("-password");
+      req.user = await User.findById(decoded.id);
 
-      // NEW: Continue to next middleware/controller
-      return next();
+      next();
+    } catch (error) {
+      return res.status(401).json({
+        message: "Not authorized, token failed",
+      });
     }
+  }
 
+  if (!token) {
     return res.status(401).json({
-      message: "No token provided"
-    });
-
-  } catch (error) {
-    return res.status(401).json({
-      message: "Not authorized"
+      message: "Not authorized, no token",
     });
   }
 };
 
+// Role authorization
+const authorize = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return res.status(403).json({
+        message: "Access denied",
+      });
+    }
+
+    next();
+  };
+};
+
 module.exports = {
-  protect
+  protect,
+  authorize,
 };
