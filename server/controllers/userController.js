@@ -1,4 +1,5 @@
 const User = require("../models/User");
+const generateToken = require("../utils/generateToken");
 
 // Return the currently logged-in user's profile
 const getProfile = async (req, res) => {
@@ -40,7 +41,45 @@ const updateProfile = async (req, res) => {
   res.status(200).json(updatedUser);
 };
 
+// Change the current user's password
+const changePassword = async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+
+  // Get user with password field included
+  const user = await User.findById(req.user._id).select("+password");
+
+  if (!user) {
+    return res.status(404).json({
+      message: "User not found",
+    });
+  }
+
+  // Verify current password
+  const isMatch = await user.matchPassword(currentPassword);
+
+  if (!isMatch) {
+    return res.status(400).json({
+      message: "Current password is incorrect",
+    });
+  }
+
+  // Set the new password
+  user.password = newPassword;
+
+  // Save user and trigger pre("save") password hashing
+  await user.save();
+
+  // Generate a new JWT token
+  const token = generateToken(user._id);
+
+  res.status(200).json({
+    message: "Password updated successfully",
+    token,
+  });
+};
+
 module.exports = {
   getProfile,
   updateProfile,
+  changePassword,
 };

@@ -1,16 +1,5 @@
-const jwt = require("jsonwebtoken");
 const User = require("../models/User");
-
-// Generate JWT token for authenticated users
-const generateToken = (id) => {
-  return jwt.sign(
-    { id },
-    process.env.JWT_SECRET,
-    {
-      expiresIn: process.env.JWT_EXPIRE
-    }
-  );
-};
+const generateToken = require("../utils/generateToken");
 
 // Register a new user
 const registerUser = async (req, res) => {
@@ -33,6 +22,7 @@ const registerUser = async (req, res) => {
 
     // Check if user already exists
     const userExists = await User.findOne({ email });
+
     if (userExists) {
       return res.status(400).json({
         message: "User already exists"
@@ -70,17 +60,17 @@ const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // NEW: Find user by email and include password field
+    // Find user by email and include password field
     const user = await User.findOne({ email }).select("+password");
 
-    // NEW: Check if user exists
+    // Check if user exists
     if (!user) {
       return res.status(401).json({
         message: "Invalid email or password"
       });
     }
 
-    // NEW: Check if password is correct
+    // Check if password is correct
     const isMatch = await user.matchPassword(password);
 
     if (!isMatch) {
@@ -89,7 +79,7 @@ const loginUser = async (req, res) => {
       });
     }
 
-    // NEW: Login successful - return user and token
+    // Login successful - return user and token
     res.status(200).json({
       _id: user._id,
       firstName: user.firstName,
