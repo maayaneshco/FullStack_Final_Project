@@ -24,6 +24,26 @@ const createProject = async (req, res) => {
   }
 };
 
+// Get all projects for current user
+const getProjects = async (req, res) => {
+  try {
+    const projects = await Project.find({
+      $or: [
+        { owner: req.user._id },
+        { members: req.user._id }
+      ]
+    })
+      .sort({ createdAt: -1 });
+
+    res.status(200).json(projects);
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to get projects",
+    });
+  }
+};
+
 module.exports = {
   createProject,
+  getProjects,
 };
