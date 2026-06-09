@@ -30,10 +30,9 @@ const getProjects = async (req, res) => {
     const projects = await Project.find({
       $or: [
         { owner: req.user._id },
-        { members: req.user._id }
-      ]
-    })
-      .sort({ createdAt: -1 });
+        { members: req.user._id },
+      ],
+    }).sort({ createdAt: -1 });
 
     res.status(200).json(projects);
   } catch (error) {
@@ -43,7 +42,40 @@ const getProjects = async (req, res) => {
   }
 };
 
+// Get single project
+const getProjectById = async (req, res) => {
+  try {
+    const project = await Project.findById(req.params.id);
+
+    if (!project) {
+      return res.status(404).json({
+        message: "Project not found",
+      });
+    }
+
+    const isOwner =
+      project.owner.toString() === req.user._id.toString();
+
+    const isMember = project.members.some(
+      (member) => member.toString() === req.user._id.toString()
+    );
+
+    if (!isOwner && !isMember && req.user.role !== "admin") {
+      return res.status(403).json({
+        message: "Access denied",
+      });
+    }
+
+    res.status(200).json(project);
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to get project",
+    });
+  }
+};
+
 module.exports = {
   createProject,
   getProjects,
+  getProjectById,
 };
