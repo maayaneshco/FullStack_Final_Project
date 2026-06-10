@@ -1,4 +1,5 @@
 const Project = require("../models/Project");
+const User = require("../models/User");
 
 // Create new project
 const createProject = async (req, res) => {
@@ -28,10 +29,7 @@ const createProject = async (req, res) => {
 const getProjects = async (req, res) => {
   try {
     const projects = await Project.find({
-      $or: [
-        { owner: req.user._id },
-        { members: req.user._id },
-      ],
+      $or: [{ owner: req.user._id }, { members: req.user._id }],
     }).sort({ createdAt: -1 });
 
     res.status(200).json(projects);
@@ -135,7 +133,9 @@ const deleteProject = async (req, res) => {
       });
     }
 
-    const isOwner = project.owner.toString() === req.user._id.toString();
+    const isOwner =
+      project.owner.toString() === req.user._id.toString();
+
     const isAdmin = req.user.role === "admin";
 
     if (!isOwner && !isAdmin) {
@@ -156,10 +156,65 @@ const deleteProject = async (req, res) => {
   }
 };
 
+// Add member to project
+const addMemberToProject = async (req, res) => {
+  try {
+    const { userId } = req.body;
+
+    const project = await Project.findById(req.params.id);
+
+    if (!project) {
+      return res.status(404).json({
+        message: "Project not found",
+      });
+    }
+
+    const isOwner =
+      project.owner.toString() === req.user._id.toString();
+
+    const isAdmin = req.user.role === "admin";
+
+    if (!isOwner && !isAdmin) {
+      return res.status(403).json({
+        message: "Access denied",
+      });
+    }
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    const alreadyMember = project.members.some(
+      (member) => member.toString() === userId
+    );
+
+    if (alreadyMember) {
+      return res.status(400).json({
+        message: "User is already a member",
+      });
+    }
+
+    project.members.push(userId);
+
+    await project.save();
+
+    res.status(200).json(project);
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to add member",
+    });
+  }
+};
+
 module.exports = {
   createProject,
   getProjects,
   getProjectById,
   updateProject,
   deleteProject,
+  addMemberToProject,
 };
