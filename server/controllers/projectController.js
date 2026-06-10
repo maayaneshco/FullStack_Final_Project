@@ -74,8 +74,59 @@ const getProjectById = async (req, res) => {
   }
 };
 
+// Update project
+const updateProject = async (req, res) => {
+  try {
+    const project = await Project.findById(req.params.id);
+
+    if (!project) {
+      return res.status(404).json({
+        message: "Project not found",
+      });
+    }
+
+    const isOwner =
+      project.owner.toString() === req.user._id.toString();
+
+    const isAdmin = req.user.role === "admin";
+
+    if (!isOwner && !isAdmin) {
+      return res.status(403).json({
+        message: "Access denied",
+      });
+    }
+
+    const {
+      title,
+      description,
+      status,
+      priority,
+      startDate,
+      endDate,
+      notes,
+    } = req.body;
+
+    project.title = title || project.title;
+    project.description = description || project.description;
+    project.status = status || project.status;
+    project.priority = priority || project.priority;
+    project.startDate = startDate || project.startDate;
+    project.endDate = endDate || project.endDate;
+    project.notes = notes || project.notes;
+
+    const updatedProject = await project.save();
+
+    res.status(200).json(updatedProject);
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to update project",
+    });
+  }
+};
+
 module.exports = {
   createProject,
   getProjects,
   getProjectById,
+  updateProject,
 };

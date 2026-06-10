@@ -4,6 +4,7 @@ const {
   createProject,
   getProjects,
   getProjectById,
+  updateProject,
 } = require("../controllers/projectController");
 
 const { protect, authorize } = require("../middleware/authMiddleware");
@@ -29,6 +30,13 @@ router.get(
   protect,
   authorize("admin", "researcher"),
   getProjectById
+);
+
+router.put(
+  "/:id",
+  protect,
+  authorize("admin", "researcher"),
+  updateProject
 );
 
 module.exports = router;
