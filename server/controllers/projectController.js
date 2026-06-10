@@ -124,9 +124,42 @@ const updateProject = async (req, res) => {
   }
 };
 
+// Delete project
+const deleteProject = async (req, res) => {
+  try {
+    const project = await Project.findById(req.params.id);
+
+    if (!project) {
+      return res.status(404).json({
+        message: "Project not found",
+      });
+    }
+
+    const isOwner = project.owner.toString() === req.user._id.toString();
+    const isAdmin = req.user.role === "admin";
+
+    if (!isOwner && !isAdmin) {
+      return res.status(403).json({
+        message: "Access denied",
+      });
+    }
+
+    await project.deleteOne();
+
+    res.status(200).json({
+      message: "Project deleted successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to delete project",
+    });
+  }
+};
+
 module.exports = {
   createProject,
   getProjects,
   getProjectById,
   updateProject,
+  deleteProject,
 };
