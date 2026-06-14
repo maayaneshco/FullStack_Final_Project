@@ -7,6 +7,7 @@ const {
   updateProject,
   deleteProject,
   addMemberToProject,
+  removeMemberFromProject,
 } = require("../controllers/projectController");
 
 const { protect, authorize } = require("../middleware/authMiddleware");
@@ -28,6 +29,13 @@ router.post(
   protect,
   authorize("admin", "researcher"),
   addMemberToProject
+);
+
+router.delete(
+  "/:id/members/:userId",
+  protect,
+  authorize("admin", "researcher"),
+  removeMemberFromProject
 );
 
 module.exports = router;

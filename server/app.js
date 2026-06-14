@@ -8,6 +8,8 @@ const helmet = require("helmet");
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const projectRoutes = require("./routes/projectRoutes");
+const taskRoutes = require("./routes/taskRoutes");
+
 
 const app = express();
 
@@ -33,6 +35,9 @@ app.use("/api/users", userRoutes);
 
 // Projects routes
 app.use("/api/projects", projectRoutes);
+
+// Tasks routes
+app.use("/api/tasks", taskRoutes);
 
 // Basic test route
 app.get("/", (req, res) => {
