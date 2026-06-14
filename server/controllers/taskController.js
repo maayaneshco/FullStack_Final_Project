@@ -357,6 +357,63 @@ const updateTaskStatus = async (req, res) => {
     }
 };
 
+const deleteTask = async (req, res) => {
+    try {
+        const task = await Task.findById(req.params.id)
+            .populate("project");
+
+        if (!task) {
+            return res.status(404).json({
+                message: "Task not found",
+            });
+        }
+
+        const isAdmin = req.user.role === "admin";
+
+        let isOwner = false;
+
+        if (task.project) {
+            isOwner =
+                task.project.owner.toString() ===
+                req.user._id.toString();
+        }
+
+        if (!isAdmin && !isOwner) {
+            return res.status(403).json({
+                message: "Not authorized to delete this task",
+            });
+        }
+
+        await task.deleteOne();
+
+        res.status(200).json({
+            message: "Task deleted successfully",
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: error.message,
+        });
+    }
+};
+
+const getMyLabTasks = async (req, res) => {
+    try {
+        const tasks = await Task.find({
+            taskType: "lab",
+            assignedTo: req.user._id,
+        })
+            .populate("assignedTo", "firstName lastName email")
+            .populate("createdBy", "firstName lastName email")
+            .sort({ dueDate: 1, createdAt: -1 });
+
+        res.status(200).json(tasks);
+    } catch (error) {
+        res.status(500).json({
+            message: error.message,
+        });
+    }
+};
+
 module.exports = {
     createTask,
     getLabTasks,
@@ -364,4 +421,6 @@ module.exports = {
     getTaskById,
     updateTask,
     updateTaskStatus,
+    deleteTask,
+    getMyLabTasks,
 };

@@ -11,18 +11,21 @@ const {
     getTaskById,
     updateTask,
     updateTaskStatus,
+    deleteTask,
+    getMyLabTasks,
 } = require("../controllers/taskController");
 
 router.post("/", protect, createTask);
 
 router.get("/lab", protect, getLabTasks);
-
 router.get("/my-project-tasks", protect, getMyProjectTasks);
-
-router.put("/:id", protect, updateTask);
-
-router.put("/:id/status", protect, updateTaskStatus);
+router.get("/my-lab-tasks", protect, getMyLabTasks);
 
 router.get("/:id", protect, getTaskById);
+
+router.put("/:id", protect, updateTask);
+router.put("/:id/status", protect, updateTaskStatus);
+
+router.delete("/:id", protect, deleteTask);
 
 module.exports = router;
