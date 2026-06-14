@@ -414,6 +414,65 @@ const getMyLabTasks = async (req, res) => {
     }
 };
 
+const getOverdueTasks = async (req, res) => {
+    try {
+        const today = new Date();
+
+        const isAdmin = req.user.role === "admin";
+
+        if (isAdmin) {
+            const tasks = await Task.find({
+                dueDate: { $lt: today },
+                status: {
+                    $nin: ["completed", "cancelled"],
+                },
+            })
+                .populate("assignedTo", "firstName lastName email")
+                .populate("createdBy", "firstName lastName email")
+                .populate("project", "title")
+                .sort({ dueDate: 1 });
+
+            return res.status(200).json(tasks);
+        }
+
+        const ownedProjects = await Project.find({
+            owner: req.user._id,
+        }).select("_id");
+
+        const ownedProjectIds = ownedProjects.map(
+            (project) => project._id
+        );
+
+        const tasks = await Task.find({
+            dueDate: { $lt: today },
+            status: {
+                $nin: ["completed", "cancelled"],
+            },
+            $or: [
+                {
+                    assignedTo: req.user._id,
+                },
+                {
+                    project: {
+                        $in: ownedProjectIds,
+                    },
+                },
+            ],
+        })
+            .populate("assignedTo", "firstName lastName email")
+            .populate("createdBy", "firstName lastName email")
+            .populate("project", "title")
+            .sort({ dueDate: 1 });
+
+        res.status(200).json(tasks);
+    } catch (error) {
+        res.status(500).json({
+            message: error.message,
+        });
+    }
+};
+
+
 module.exports = {
     createTask,
     getLabTasks,
@@ -423,4 +482,5 @@ module.exports = {
     updateTaskStatus,
     deleteTask,
     getMyLabTasks,
+    getOverdueTasks,
 };

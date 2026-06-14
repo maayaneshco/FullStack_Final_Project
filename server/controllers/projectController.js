@@ -1,4 +1,5 @@
 const Project = require("../models/Project");
+const Task = require("../models/Task");
 const User = require("../models/User");
 
 // Create new project
@@ -264,6 +265,47 @@ const removeMemberFromProject = async (req, res) => {
   }
 };
 
+const getProjectTasks = async (req, res) => {
+  try {
+    const project = await Project.findById(req.params.id);
+
+    if (!project) {
+      return res.status(404).json({
+        message: "Project not found",
+      });
+    }
+
+    const isAdmin = req.user.role === "admin";
+
+    const isOwner =
+      project.owner.toString() === req.user._id.toString();
+
+    const isMember = project.members.some(
+      (member) =>
+        member.toString() === req.user._id.toString()
+    );
+
+    if (!isAdmin && !isOwner && !isMember) {
+      return res.status(403).json({
+        message: "Not authorized to view project tasks",
+      });
+    }
+
+    const tasks = await Task.find({
+      project: project._id,
+    })
+      .populate("assignedTo", "firstName lastName email")
+      .populate("createdBy", "firstName lastName email")
+      .sort({ createdAt: -1 });
+
+    res.status(200).json(tasks);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   createProject,
   getProjects,
@@ -272,4 +314,5 @@ module.exports = {
   deleteProject,
   addMemberToProject,
   removeMemberFromProject,
+  getProjectTasks,
 };
