@@ -472,6 +472,55 @@ const getOverdueTasks = async (req, res) => {
     }
 };
 
+const getCompletedTasks = async (req, res) => {
+    try {
+        const isAdmin = req.user.role === "admin";
+
+        if (isAdmin) {
+            const tasks = await Task.find({
+                status: "completed",
+            })
+                .populate("assignedTo", "firstName lastName email")
+                .populate("createdBy", "firstName lastName email")
+                .populate("project", "title")
+                .sort({ updatedAt: -1 });
+
+            return res.status(200).json(tasks);
+        }
+
+        const ownedProjects = await Project.find({
+            owner: req.user._id,
+        }).select("_id");
+
+        const ownedProjectIds = ownedProjects.map(
+            (project) => project._id
+        );
+
+        const tasks = await Task.find({
+            status: "completed",
+            $or: [
+                {
+                    assignedTo: req.user._id,
+                },
+                {
+                    project: {
+                        $in: ownedProjectIds,
+                    },
+                },
+            ],
+        })
+            .populate("assignedTo", "firstName lastName email")
+            .populate("createdBy", "firstName lastName email")
+            .populate("project", "title")
+            .sort({ updatedAt: -1 });
+
+        res.status(200).json(tasks);
+    } catch (error) {
+        res.status(500).json({
+            message: error.message,
+        });
+    }
+};
 
 module.exports = {
     createTask,
@@ -483,4 +532,5 @@ module.exports = {
     deleteTask,
     getMyLabTasks,
     getOverdueTasks,
+    getCompletedTasks,
 };

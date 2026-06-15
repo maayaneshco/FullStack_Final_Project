@@ -14,6 +14,7 @@ const {
     deleteTask,
     getMyLabTasks,
     getOverdueTasks,
+    getCompletedTasks,
 } = require("../controllers/taskController");
 
 router.post("/", protect, createTask);
@@ -25,6 +26,8 @@ router.get("/my-project-tasks", protect, getMyProjectTasks);
 router.get("/my-lab-tasks", protect, getMyLabTasks);
 
 router.get("/overdue", protect, getOverdueTasks);
+
+router.get("/completed", protect, getCompletedTasks);
 
 router.get("/:id", protect, getTaskById);
 
