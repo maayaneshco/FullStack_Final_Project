@@ -85,7 +85,41 @@ const getInventoryItems = async (req, res) => {
     }
 };
 
+// Get inventory item by ID
+const getInventoryItemById = async (req, res) => {
+    try {
+        // Find inventory item by ID
+        const inventoryItem = await Inventory.findById(
+            req.params.id
+        )
+            .populate(
+                "responsibleUser",
+                "firstName lastName email"
+            )
+            .populate(
+                "createdBy",
+                "firstName lastName email"
+            );
+
+        // Check if inventory item exists
+        if (!inventoryItem) {
+            return res.status(404).json({
+                message: "Inventory item not found",
+            });
+        }
+
+        // Return inventory item
+        res.status(200).json(inventoryItem);
+    } catch (error) {
+        // Handle server errors
+        res.status(500).json({
+            message: error.message,
+        });
+    }
+};
+
 module.exports = {
     createInventoryItem,
     getInventoryItems,
+    getInventoryItemById,
 };

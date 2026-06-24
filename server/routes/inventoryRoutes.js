@@ -5,6 +5,7 @@ const router = express.Router();
 const {
     createInventoryItem,
     getInventoryItems,
+    getInventoryItemById,
 } = require("../controllers/inventoryController");
 
 const {
@@ -17,6 +18,13 @@ router.get(
     "/",
     protect,
     getInventoryItems
+);
+
+// Get inventory item by ID
+router.get(
+    "/:id",
+    protect,
+    getInventoryItemById
 );
 
 // Create inventory item
