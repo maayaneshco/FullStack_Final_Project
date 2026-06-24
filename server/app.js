@@ -10,7 +10,7 @@ const userRoutes = require("./routes/userRoutes");
 const projectRoutes = require("./routes/projectRoutes");
 const taskRoutes = require("./routes/taskRoutes");
 const responsibilityRoutes = require("./routes/responsibilityRoutes");
-
+const inventoryRoutes = require("./routes/inventoryRoutes");
 
 const app = express();
 
@@ -42,6 +42,9 @@ app.use("/api/tasks", taskRoutes);
 
 // Responsibilities routes
 app.use("/api/responsibilities", responsibilityRoutes);
+
+// Inventory routes
+app.use("/api/inventory", inventoryRoutes);
 
 // Basic test route
 app.get("/", (req, res) => {
