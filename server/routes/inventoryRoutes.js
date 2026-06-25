@@ -6,6 +6,7 @@ const {
     createInventoryItem,
     getInventoryItems,
     getInventoryItemById,
+    updateInventoryItem,
 } = require("../controllers/inventoryController");
 
 const {
@@ -25,6 +26,14 @@ router.get(
     "/:id",
     protect,
     getInventoryItemById
+);
+
+// Update inventory item
+router.put(
+    "/:id",
+    protect,
+    authorize("admin"),
+    updateInventoryItem
 );
 
 // Create inventory item

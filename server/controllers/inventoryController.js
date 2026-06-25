@@ -118,8 +118,111 @@ const getInventoryItemById = async (req, res) => {
     }
 };
 
+// Update inventory item (Admin only)
+const updateInventoryItem = async (req, res) => {
+    try {
+        const {
+            name,
+            description,
+            category,
+            unit,
+            quantity,
+            minimumQuantity,
+            location,
+            supplier,
+            catalogNumber,
+            expirationDate,
+            responsibleUser,
+            notes,
+            isActive,
+        } = req.body;
+
+        // Check if inventory item exists
+        const inventoryItem = await Inventory.findById(
+            req.params.id
+        );
+
+        if (!inventoryItem) {
+            return res.status(404).json({
+                message: "Inventory item not found",
+            });
+        }
+
+        // Check for duplicate name
+        if (name && name !== inventoryItem.name) {
+            const existingItem = await Inventory.findOne({
+                name,
+            });
+
+            if (existingItem) {
+                return res.status(400).json({
+                    message:
+                        "Inventory item with this name already exists",
+                });
+            }
+        }
+
+        // Update fields
+        inventoryItem.name =
+            name ?? inventoryItem.name;
+
+        inventoryItem.description =
+            description ?? inventoryItem.description;
+
+        inventoryItem.category =
+            category ?? inventoryItem.category;
+
+        inventoryItem.unit =
+            unit ?? inventoryItem.unit;
+
+        inventoryItem.quantity =
+            quantity ?? inventoryItem.quantity;
+
+        inventoryItem.minimumQuantity =
+            minimumQuantity ??
+            inventoryItem.minimumQuantity;
+
+        inventoryItem.location =
+            location ?? inventoryItem.location;
+
+        inventoryItem.supplier =
+            supplier ?? inventoryItem.supplier;
+
+        inventoryItem.catalogNumber =
+            catalogNumber ??
+            inventoryItem.catalogNumber;
+
+        inventoryItem.expirationDate =
+            expirationDate ??
+            inventoryItem.expirationDate;
+
+        inventoryItem.responsibleUser =
+            responsibleUser ??
+            inventoryItem.responsibleUser;
+
+        inventoryItem.notes =
+            notes ?? inventoryItem.notes;
+
+        inventoryItem.isActive =
+            isActive ?? inventoryItem.isActive;
+
+        // Save changes
+        const updatedInventoryItem =
+            await inventoryItem.save();
+
+        // Return updated inventory item
+        res.status(200).json(updatedInventoryItem);
+    } catch (error) {
+        // Handle server errors
+        res.status(500).json({
+            message: error.message,
+        });
+    }
+};
+
 module.exports = {
     createInventoryItem,
     getInventoryItems,
     getInventoryItemById,
+    updateInventoryItem,
 };
