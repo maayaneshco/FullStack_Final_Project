@@ -291,6 +291,40 @@ const getLowStockItems = async (req, res) => {
     }
 };
 
+// Get expired inventory items
+const getExpiredInventoryItems = async (req, res) => {
+    try {
+        // Get current date
+        const today = new Date();
+
+        // Get expired active inventory items
+        const expiredItems = await Inventory.find({
+            isActive: true,
+            expirationDate: {
+                $exists: true,
+                $lt: today,
+            },
+        })
+            .populate(
+                "responsibleUser",
+                "firstName lastName email"
+            )
+            .populate(
+                "createdBy",
+                "firstName lastName email"
+            )
+            .sort({ expirationDate: 1 });
+
+        // Return expired inventory items
+        res.status(200).json(expiredItems);
+    } catch (error) {
+        // Handle server errors
+        res.status(500).json({
+            message: error.message,
+        });
+    }
+};
+
 module.exports = {
     createInventoryItem,
     getInventoryItems,
@@ -298,4 +332,5 @@ module.exports = {
     updateInventoryItem,
     deleteInventoryItem,
     getLowStockItems,
+    getExpiredInventoryItems,
 };
