@@ -7,6 +7,7 @@ const {
     getInventoryItems,
     getInventoryItemById,
     updateInventoryItem,
+    deleteInventoryItem,
 } = require("../controllers/inventoryController");
 
 const {
@@ -34,6 +35,14 @@ router.put(
     protect,
     authorize("admin"),
     updateInventoryItem
+);
+
+// Delete inventory item
+router.delete(
+    "/:id",
+    protect,
+    authorize("admin"),
+    deleteInventoryItem
 );
 
 // Create inventory item

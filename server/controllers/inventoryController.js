@@ -220,9 +220,50 @@ const updateInventoryItem = async (req, res) => {
     }
 };
 
+// Delete inventory item (Soft Delete - Admin only)
+const deleteInventoryItem = async (req, res) => {
+    try {
+        // Find inventory item by ID
+        const inventoryItem = await Inventory.findById(
+            req.params.id
+        );
+
+        // Check if inventory item exists
+        if (!inventoryItem) {
+            return res.status(404).json({
+                message: "Inventory item not found",
+            });
+        }
+
+        // Check if inventory item is already inactive
+        if (!inventoryItem.isActive) {
+            return res.status(400).json({
+                message: "Inventory item is already inactive",
+            });
+        }
+
+        // Mark inventory item as inactive
+        inventoryItem.isActive = false;
+
+        // Save changes
+        await inventoryItem.save();
+
+        // Return success message
+        res.status(200).json({
+            message: "Inventory item deleted successfully",
+        });
+    } catch (error) {
+        // Handle server errors
+        res.status(500).json({
+            message: error.message,
+        });
+    }
+};
+
 module.exports = {
     createInventoryItem,
     getInventoryItems,
     getInventoryItemById,
     updateInventoryItem,
+    deleteInventoryItem,
 };
