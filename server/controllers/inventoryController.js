@@ -260,10 +260,42 @@ const deleteInventoryItem = async (req, res) => {
     }
 };
 
+// Get low stock inventory items
+const getLowStockItems = async (req, res) => {
+    try {
+        // Get all active inventory items
+        const inventoryItems = await Inventory.find({
+            isActive: true,
+        })
+            .populate(
+                "responsibleUser",
+                "firstName lastName email"
+            )
+            .populate(
+                "createdBy",
+                "firstName lastName email"
+            );
+
+        // Filter low stock items
+        const lowStockItems = inventoryItems.filter(
+            (item) => item.quantity <= item.minimumQuantity
+        );
+
+        // Return low stock items
+        res.status(200).json(lowStockItems);
+    } catch (error) {
+        // Handle server errors
+        res.status(500).json({
+            message: error.message,
+        });
+    }
+};
+
 module.exports = {
     createInventoryItem,
     getInventoryItems,
     getInventoryItemById,
     updateInventoryItem,
     deleteInventoryItem,
+    getLowStockItems,
 };

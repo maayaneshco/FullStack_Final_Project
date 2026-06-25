@@ -8,6 +8,7 @@ const {
     getInventoryItemById,
     updateInventoryItem,
     deleteInventoryItem,
+    getLowStockItems,
 } = require("../controllers/inventoryController");
 
 const {
@@ -20,6 +21,13 @@ router.get(
     "/",
     protect,
     getInventoryItems
+);
+
+// Get low stock inventory items
+router.get(
+    "/low-stock",
+    protect,
+    getLowStockItems
 );
 
 // Get inventory item by ID
