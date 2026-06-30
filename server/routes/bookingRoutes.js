@@ -4,6 +4,7 @@ const router = express.Router();
 
 const {
     createBooking,
+    getBookings,
 } = require("../controllers/bookingController");
 
 const {
@@ -15,6 +16,13 @@ router.post(
     "/",
     protect,
     createBooking
+);
+
+// Get all bookings
+router.get(
+    "/",
+    protect,
+    getBookings
 );
 
 module.exports = router;

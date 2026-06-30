@@ -92,6 +92,36 @@ const createBooking = async (req, res) => {
     }
 };
 
+// Get all bookings
+const getBookings = async (req, res) => {
+    try {
+        // Get all bookings
+        const bookings = await Booking.find()
+            .populate(
+                "equipment",
+                "name category location status"
+            )
+            .populate(
+                "bookedBy",
+                "firstName lastName email"
+            )
+            .populate(
+                "createdBy",
+                "firstName lastName email"
+            )
+            .sort({ createdAt: -1 });
+
+        // Return bookings
+        res.status(200).json(bookings);
+    } catch (error) {
+        // Handle server errors
+        res.status(500).json({
+            message: error.message,
+        });
+    }
+};
+
 module.exports = {
     createBooking,
+    getBookings,
 };
