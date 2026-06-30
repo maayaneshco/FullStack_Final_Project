@@ -8,6 +8,7 @@ const {
     getMyBookings,
     getEquipmentBookings,
     cancelBooking,
+    updateBooking,
 } = require("../controllers/bookingController");
 
 const {
@@ -33,6 +34,13 @@ router.get(
     "/equipment/:equipmentId",
     protect,
     getEquipmentBookings
+);
+
+// Update booking
+router.put(
+    "/:id",
+    protect,
+    updateBooking
 );
 
 // Cancel booking

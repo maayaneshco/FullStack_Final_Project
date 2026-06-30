@@ -248,10 +248,97 @@ const cancelBooking = async (req, res) => {
     }
 };
 
+// Update booking
+const updateBooking = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const {
+            startTime,
+            endTime,
+            purpose,
+        } = req.body;
+
+        // Check if booking ID is valid
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({
+                message: "Invalid booking ID",
+            });
+        }
+
+        // Find booking
+        const booking = await Booking.findById(id);
+
+        // Check if booking exists
+        if (!booking) {
+            return res.status(404).json({
+                message: "Booking not found",
+            });
+        }
+
+        // Check permissions
+        if (
+            req.user.role !== "admin" &&
+            booking.bookedBy.toString() !== req.user._id.toString()
+        ) {
+            return res.status(403).json({
+                message: "Not authorized to update this booking",
+            });
+        }
+
+        // Determine updated values
+        const newStartTime = startTime ?? booking.startTime;
+        const newEndTime = endTime ?? booking.endTime;
+
+        // Validate time range
+        if (new Date(newStartTime) >= new Date(newEndTime)) {
+            return res.status(400).json({
+                message: "Start time must be before end time",
+            });
+        }
+
+        // Check overlapping bookings (ignore current booking)
+        const overlappingBooking = await Booking.findOne({
+            _id: { $ne: booking._id }, // Ignore the current booking to prevent it from matching itself
+            equipment: booking.equipment,
+            status: "active",
+            startTime: {
+                $lt: new Date(newEndTime),
+            },
+            endTime: {
+                $gt: new Date(newStartTime),
+            },
+        });
+
+        if (overlappingBooking) {
+            return res.status(400).json({
+                message:
+                    "Equipment is already booked for this time range",
+            });
+        }
+
+        // Update booking
+        booking.startTime = newStartTime;
+        booking.endTime = newEndTime;
+        booking.purpose = purpose ?? booking.purpose;
+
+        // Save changes
+        const updatedBooking = await booking.save();
+
+        // Return updated booking
+        res.status(200).json(updatedBooking);
+    } catch (error) {
+        // Handle server errors
+        res.status(500).json({
+            message: error.message,
+        });
+    }
+};
+
 module.exports = {
     createBooking,
     getBookings,
     getMyBookings,
     getEquipmentBookings,
     cancelBooking,
+    updateBooking,
 };
