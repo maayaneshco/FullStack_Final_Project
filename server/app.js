@@ -12,6 +12,7 @@ const taskRoutes = require("./routes/taskRoutes");
 const responsibilityRoutes = require("./routes/responsibilityRoutes");
 const inventoryRoutes = require("./routes/inventoryRoutes");
 const equipmentRoutes = require("./routes/equipmentRoutes");
+const bookingRoutes = require("./routes/bookingRoutes");
 
 const app = express();
 
@@ -49,6 +50,9 @@ app.use("/api/inventory", inventoryRoutes);
 
 // Equipment routes
 app.use("/api/equipment", equipmentRoutes);
+
+// Booking routes
+app.use("/api/bookings", bookingRoutes);
 
 // Basic test route
 app.get("/", (req, res) => {
