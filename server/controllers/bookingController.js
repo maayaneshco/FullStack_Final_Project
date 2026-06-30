@@ -121,7 +121,137 @@ const getBookings = async (req, res) => {
     }
 };
 
+// Get logged-in user's bookings
+const getMyBookings = async (req, res) => {
+    try {
+        // Get bookings created for the logged-in user
+        const bookings = await Booking.find({
+            bookedBy: req.user._id,
+        })
+            .populate(
+                "equipment",
+                "name category location status"
+            )
+            .populate(
+                "bookedBy",
+                "firstName lastName email"
+            )
+            .populate(
+                "createdBy",
+                "firstName lastName email"
+            )
+            .sort({ startTime: 1 });
+
+        // Return user's bookings
+        res.status(200).json(bookings);
+    } catch (error) {
+        // Handle server errors
+        res.status(500).json({
+            message: error.message,
+        });
+    }
+};
+
+// Get bookings for a specific equipment
+const getEquipmentBookings = async (req, res) => {
+    try {
+        const { equipmentId } = req.params;
+
+        // Check if equipment ID is valid
+        if (!mongoose.Types.ObjectId.isValid(equipmentId)) {
+            return res.status(400).json({
+                message: "Invalid equipment ID",
+            });
+        }
+
+        // Get bookings for the selected equipment
+        const bookings = await Booking.find({
+            equipment: equipmentId,
+        })
+            .populate(
+                "equipment",
+                "name category location status"
+            )
+            .populate(
+                "bookedBy",
+                "firstName lastName email"
+            )
+            .populate(
+                "createdBy",
+                "firstName lastName email"
+            )
+            .sort({ startTime: 1 });
+
+        // Return bookings
+        res.status(200).json(bookings);
+    } catch (error) {
+        // Handle server errors
+        res.status(500).json({
+            message: error.message,
+        });
+    }
+};
+
+// Cancel booking
+const cancelBooking = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Check if booking ID is valid
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({
+                message: "Invalid booking ID",
+            });
+        }
+
+        // Find booking by ID
+        const booking = await Booking.findById(id);
+
+        // Check if booking exists
+        if (!booking) {
+            return res.status(404).json({
+                message: "Booking not found",
+            });
+        }
+
+        // Allow admin to cancel any booking
+        // Allow researcher to cancel only their own booking
+        if (
+            req.user.role !== "admin" &&
+            booking.bookedBy.toString() !== req.user._id.toString()
+        ) {
+            return res.status(403).json({
+                message: "Not authorized to cancel this booking",
+            });
+        }
+
+        // Check if booking is already cancelled
+        if (booking.status === "cancelled") {
+            return res.status(400).json({
+                message: "Booking is already cancelled",
+            });
+        }
+
+        // Cancel booking
+        booking.status = "cancelled";
+
+        // Save changes
+        const cancelledBooking = await booking.save();
+
+        // Return cancelled booking
+        res.status(200).json(cancelledBooking);
+    } catch (error) {
+        // Handle server errors
+        res.status(500).json({
+            message: error.message,
+        });
+    }
+};
+
 module.exports = {
     createBooking,
     getBookings,
+    getMyBookings,
+    getEquipmentBookings,
+    cancelBooking,
 };
