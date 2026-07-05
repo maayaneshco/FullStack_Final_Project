@@ -14,6 +14,7 @@ const inventoryRoutes = require("./routes/inventoryRoutes");
 const equipmentRoutes = require("./routes/equipmentRoutes");
 const bookingRoutes = require("./routes/bookingRoutes");
 const protocolRoutes = require("./routes/protocolRoutes");
+const dashboardRoutes = require("./routes/dashboardRoutes");
 
 const app = express();
 
@@ -57,6 +58,9 @@ app.use("/api/bookings", bookingRoutes);
 
 // Protocols routes
 app.use("/api/protocols", protocolRoutes);
+
+// Dashboard routes
+app.use("/api/dashboard", dashboardRoutes);
 
 // Basic test route
 app.get("/", (req, res) => {
