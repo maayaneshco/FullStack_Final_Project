@@ -1,5 +1,8 @@
 import { Routes, Route } from "react-router-dom";
 
+import AuthLayout from "../layouts/AuthLayout";
+import DashboardLayout from "../layouts/DashboardLayout";
+
 import {
     LoginPage,
     RegisterPage,
@@ -30,63 +33,77 @@ const AppRouter = () => {
     return (
         <Routes>
             {/* Public Routes */}
-            <Route path="/" element={<LoginPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
+            <Route element={<AuthLayout />}>
+                <Route index element={<LoginPage />} />
+                <Route path="login" element={<LoginPage />} />
+                <Route path="register" element={<RegisterPage />} />
+            </Route>
 
-            {/* Dashboard */}
-            <Route path="/dashboard" element={<DashboardPage />} />
+            {/* Dashboard Routes */}
+            <Route element={<DashboardLayout />}>
+                <Route path="dashboard" element={<DashboardPage />} />
 
-            {/* User */}
-            <Route path="/users" element={<UsersPage />} />
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/change-password" element={<ChangePasswordPage />} />
+                <Route path="users" element={<UsersPage />} />
+                <Route path="profile" element={<ProfilePage />} />
+                <Route
+                    path="change-password"
+                    element={<ChangePasswordPage />}
+                />
 
-            {/* Projects */}
-            <Route path="/projects" element={<ProjectsPage />} />
-            <Route path="/projects/:id" element={<ProjectDetailsPage />} />
+                <Route path="projects" element={<ProjectsPage />} />
+                <Route
+                    path="projects/:id"
+                    element={<ProjectDetailsPage />}
+                />
 
-            {/* Tasks */}
-            <Route path="/tasks" element={<TasksPage />} />
-            <Route path="/tasks/completed" element={<CompletedTasksPage />} />
-            <Route path="/tasks/overdue" element={<OverdueTasksPage />} />
+                <Route path="tasks" element={<TasksPage />} />
+                <Route
+                    path="tasks/completed"
+                    element={<CompletedTasksPage />}
+                />
+                <Route
+                    path="tasks/overdue"
+                    element={<OverdueTasksPage />}
+                />
 
-            {/* Responsibilities */}
-            <Route
-                path="/responsibilities"
-                element={<ResponsibilitiesPage />}
-            />
-            <Route
-                path="/responsibilities/my"
-                element={<MyResponsibilitiesPage />}
-            />
+                <Route
+                    path="responsibilities"
+                    element={<ResponsibilitiesPage />}
+                />
+                <Route
+                    path="responsibilities/my"
+                    element={<MyResponsibilitiesPage />}
+                />
 
-            {/* Inventory */}
-            <Route path="/inventory" element={<InventoryPage />} />
-            <Route path="/inventory/low-stock" element={<LowStockPage />} />
-            <Route
-                path="/inventory/expired"
-                element={<ExpiredInventoryPage />}
-            />
+                <Route path="inventory" element={<InventoryPage />} />
+                <Route
+                    path="inventory/low-stock"
+                    element={<LowStockPage />}
+                />
+                <Route
+                    path="inventory/expired"
+                    element={<ExpiredInventoryPage />}
+                />
 
-            {/* Equipment */}
-            <Route path="/equipment" element={<EquipmentPage />} />
-            <Route
-                path="/equipment/:id"
-                element={<EquipmentDetailsPage />}
-            />
+                <Route path="equipment" element={<EquipmentPage />} />
+                <Route
+                    path="equipment/:id"
+                    element={<EquipmentDetailsPage />}
+                />
 
-            {/* Bookings */}
-            <Route path="/bookings" element={<BookingsPage />} />
-            <Route path="/bookings/my" element={<MyBookingsPage />} />
+                <Route path="bookings" element={<BookingsPage />} />
+                <Route
+                    path="bookings/my"
+                    element={<MyBookingsPage />}
+                />
 
-            {/* Protocols */}
-            <Route path="/protocols" element={<ProtocolsPage />} />
+                <Route path="protocols" element={<ProtocolsPage />} />
+            </Route>
 
-            {/* Errors */}
-            <Route path="/401" element={<UnauthorizedPage />} />
+            {/* Error Pages */}
+            <Route path="401" element={<UnauthorizedPage />} />
 
-            {/* Fallback */}
+            {/* 404 */}
             <Route path="*" element={<NotFoundPage />} />
         </Routes>
     );
