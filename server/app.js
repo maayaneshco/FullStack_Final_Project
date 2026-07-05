@@ -13,6 +13,7 @@ const responsibilityRoutes = require("./routes/responsibilityRoutes");
 const inventoryRoutes = require("./routes/inventoryRoutes");
 const equipmentRoutes = require("./routes/equipmentRoutes");
 const bookingRoutes = require("./routes/bookingRoutes");
+const protocolRoutes = require("./routes/protocolRoutes");
 
 const app = express();
 
@@ -53,6 +54,9 @@ app.use("/api/equipment", equipmentRoutes);
 
 // Booking routes
 app.use("/api/bookings", bookingRoutes);
+
+// Protocols routes
+app.use("/api/protocols", protocolRoutes);
 
 // Basic test route
 app.get("/", (req, res) => {
