@@ -5,7 +5,7 @@ import { Provider } from "react-redux";
 
 import App from "./App";
 import { AuthProvider } from "./context";
-import store from "./redux/store";
+import { store } from "./redux";
 
 import "./styles/globals.css";
 
