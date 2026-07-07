@@ -1,6 +1,7 @@
 import {
     createContext,
     useCallback,
+    useContext,
     useEffect,
     useMemo,
     useState,
@@ -13,6 +14,10 @@ import {
 } from "../utils/tokenStorage";
 
 export const AuthContext = createContext(null);
+
+export const useAuth = () => {
+    return useContext(AuthContext);
+};
 
 const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
