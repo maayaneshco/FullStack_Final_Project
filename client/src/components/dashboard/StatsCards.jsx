@@ -1,27 +1,54 @@
-const stats = [
+const buildStats = (summary = {}) => [
     {
-        label: "Active Projects",
-        value: "8",
-        description: "Research projects in progress",
+        label: "Total Projects",
+        value: summary.totalProjects ?? 0,
+        description: "Research projects in the lab",
+    },
+    {
+        label: "Total Tasks",
+        value: summary.totalTasks ?? 0,
+        description: "Tracked project tasks",
     },
     {
         label: "Open Tasks",
-        value: "24",
+        value: summary.openTasks ?? 0,
         description: "Tasks waiting for completion",
     },
     {
-        label: "Inventory Items",
-        value: "126",
-        description: "Tracked lab materials",
+        label: "Completed Tasks",
+        value: summary.completedTasks ?? 0,
+        description: "Tasks marked completed",
     },
     {
-        label: "Equipment Bookings",
-        value: "12",
-        description: "Upcoming reservations",
+        label: "Low Stock Items",
+        value: summary.lowStockItems ?? 0,
+        description: "Inventory at or below minimum",
+    },
+    {
+        label: "Expired Inventory",
+        value: summary.expiredInventory ?? 0,
+        description: "Active items past expiration",
+    },
+    {
+        label: "Available Equipment",
+        value: summary.availableEquipment ?? 0,
+        description: "Equipment ready for booking",
+    },
+    {
+        label: "Active Bookings",
+        value: summary.activeBookings ?? 0,
+        description: "Current equipment reservations",
+    },
+    {
+        label: "Protocols",
+        value: summary.totalProtocols ?? 0,
+        description: "Active protocol documents",
     },
 ];
 
-const StatsCards = () => {
+const StatsCards = ({ loading = false, summary }) => {
+    const stats = buildStats(summary);
+
     return (
         <section className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
             {stats.map((stat) => (
@@ -34,7 +61,7 @@ const StatsCards = () => {
                     </p>
 
                     <p className="mt-4 text-3xl font-bold text-[#1A2F4D]">
-                        {stat.value}
+                        {loading ? "..." : stat.value}
                     </p>
 
                     <p className="mt-2 text-sm text-slate-500">
