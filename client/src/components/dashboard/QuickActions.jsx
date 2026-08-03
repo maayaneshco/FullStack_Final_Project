@@ -3,19 +3,19 @@ import { Link } from "react-router-dom";
 const actions = [
     {
         label: "Create Project",
-        path: "/dashboard/projects",
+        path: "/projects",
     },
     {
         label: "Add Task",
-        path: "/dashboard/tasks",
+        path: "/tasks",
     },
     {
         label: "Update Inventory",
-        path: "/dashboard/inventory",
+        path: "/inventory",
     },
     {
         label: "Book Equipment",
-        path: "/dashboard/equipment-bookings",
+        path: "/bookings",
     },
 ];
 
