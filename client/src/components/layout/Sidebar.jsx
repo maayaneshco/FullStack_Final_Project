@@ -14,6 +14,10 @@ const navigationItems = [
         path: "/tasks",
     },
     {
+        label: "Responsibilities",
+        path: "/responsibilities",
+    },
+    {
         label: "Equipment",
         path: "/equipment",
     },
