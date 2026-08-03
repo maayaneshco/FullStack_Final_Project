@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 import LoginForm from "../../components/auth/LoginForm";
 
 const LoginPage = () => {
@@ -14,6 +16,16 @@ const LoginPage = () => {
                 </div>
 
                 <LoginForm />
+
+                <p className="mt-6 text-center text-sm text-slate-600">
+                    Don&apos;t have an account?{" "}
+                    <Link
+                        to="/register"
+                        className="font-semibold text-[#1A2F4D] hover:underline"
+                    >
+                        Register
+                    </Link>
+                </p>
             </div>
         </div>
     );
