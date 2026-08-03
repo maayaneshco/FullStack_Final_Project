@@ -1,4 +1,6 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+
+import { useAuth } from "../../context";
 
 const navigationItems = [
     {
@@ -40,9 +42,17 @@ const navigationItems = [
 ];
 
 const Sidebar = () => {
+    const { logout } = useAuth();
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        logout();
+        navigate("/login", { replace: true });
+    };
+
     return (
-        <aside className="flex h-screen w-72 flex-col bg-[var(--color-primary)] text-white">
-            <div className="border-b border-white/10 p-8">
+        <aside className="flex h-screen w-72 shrink-0 flex-col overflow-hidden bg-[var(--color-primary)] text-white">
+            <div className="shrink-0 border-b border-white/10 p-8">
                 <h2 className="text-2xl font-bold">
                     Kehat Lab
                 </h2>
@@ -52,16 +62,17 @@ const Sidebar = () => {
                 </p>
             </div>
 
-            <nav className="flex-1 px-4 py-6">
+            <nav className="min-h-0 flex-1 overflow-y-auto px-4 py-6">
                 <ul className="space-y-2">
                     {navigationItems.map((item) => (
                         <li key={item.path}>
                             <NavLink
                                 to={item.path}
                                 className={({ isActive }) =>
-                                    `block rounded-xl px-4 py-3 transition ${isActive
-                                        ? "bg-white/10"
-                                        : "hover:bg-white/5"
+                                    `block rounded-xl px-4 py-3 transition ${
+                                        isActive
+                                            ? "bg-white/10"
+                                            : "hover:bg-white/5"
                                     }`
                                 }
                             >
@@ -72,13 +83,14 @@ const Sidebar = () => {
                 </ul>
             </nav>
 
-            <div className="border-t border-white/10 p-6">
-                <a
-                    href="/"
-                    className="block rounded-xl px-4 py-3 transition hover:bg-white/5"
+            <div className="mt-auto shrink-0 border-t border-white/10 p-6">
+                <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="block w-full rounded-xl px-4 py-3 text-left transition hover:bg-white/5"
                 >
-                    ← Back to Website
-                </a>
+                    Logout
+                </button>
             </div>
         </aside>
     );

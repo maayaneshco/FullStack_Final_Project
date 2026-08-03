@@ -1,37 +1,59 @@
 import {
-    createContext,
     useCallback,
-    useContext,
     useEffect,
     useMemo,
     useState,
 } from "react";
 
+import userService from "../services/userService";
 import {
     getToken,
     setToken as saveToken,
     removeToken,
 } from "../utils/tokenStorage";
-
-export const AuthContext = createContext(null);
-
-export const useAuth = () => {
-    return useContext(AuthContext);
-};
+import AuthContext from "./authContextValue";
 
 const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
-    const [token, setToken] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [token, setToken] = useState(() => getToken());
+    const [loading, setLoading] = useState(() => Boolean(getToken()));
 
     useEffect(() => {
         const savedToken = getToken();
 
-        if (savedToken) {
-            setToken(savedToken);
+        if (!savedToken) {
+            return;
         }
 
-        setLoading(false);
+        let isMounted = true;
+
+        const restoreSession = async () => {
+            try {
+                const restoredUser = await userService.getProfile();
+
+                if (isMounted) {
+                    setUser(restoredUser);
+                    setToken(savedToken);
+                }
+            } catch {
+                removeToken();
+
+                if (isMounted) {
+                    setUser(null);
+                    setToken(null);
+                }
+            } finally {
+                if (isMounted) {
+                    setLoading(false);
+                }
+            }
+        };
+
+        restoreSession();
+
+        return () => {
+            isMounted = false;
+        };
     }, []);
 
     const login = useCallback((userData, accessToken) => {
