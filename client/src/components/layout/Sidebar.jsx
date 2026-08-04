@@ -60,8 +60,8 @@ const Sidebar = () => {
     };
 
     return (
-        <aside className="flex h-screen w-72 shrink-0 flex-col overflow-hidden bg-[var(--color-primary)] text-white">
-            <div className="shrink-0 border-b border-white/10 p-8">
+        <aside className="flex max-h-screen w-full shrink-0 flex-col overflow-hidden bg-[var(--color-primary)] text-white lg:h-screen lg:w-72">
+            <div className="shrink-0 border-b border-white/10 p-4 lg:p-8">
                 <h2 className="text-2xl font-bold">
                     Kehat Lab
                 </h2>
@@ -71,7 +71,7 @@ const Sidebar = () => {
                 </p>
             </div>
 
-            <nav className="min-h-0 flex-1 overflow-y-auto px-4 py-6">
+            <nav className="min-h-0 flex-1 overflow-y-auto px-4 py-4 lg:py-6">
                 <ul className="space-y-2">
                     {visibleNavigationItems.map((item) => (
                         <li key={item.path}>
@@ -92,7 +92,7 @@ const Sidebar = () => {
                 </ul>
             </nav>
 
-            <div className="mt-auto shrink-0 border-t border-white/10 p-6">
+            <div className="mt-auto shrink-0 border-t border-white/10 p-4 lg:p-6">
                 <button
                     type="button"
                     onClick={handleLogout}

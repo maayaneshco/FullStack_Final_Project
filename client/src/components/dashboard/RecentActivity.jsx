@@ -12,16 +12,22 @@ const formatDate = (value) => {
         return "";
     }
 
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+        return "";
+    }
+
     return new Intl.DateTimeFormat("en", {
         month: "short",
         day: "numeric",
-    }).format(new Date(value));
+    }).format(date);
 };
 
 const buildActivities = (recent = {}) => {
     const projects = (recent.projects || []).map((project) => ({
         id: `project-${project._id}`,
-        title: `Project: ${project.title}`,
+        title: `Project: ${project.title || "Untitled project"}`,
         description: `Created by ${formatUser(project.createdBy)}`,
         time: formatDate(project.createdAt),
         createdAt: project.createdAt,
@@ -29,7 +35,7 @@ const buildActivities = (recent = {}) => {
 
     const tasks = (recent.tasks || []).map((task) => ({
         id: `task-${task._id}`,
-        title: `Task: ${task.title}`,
+        title: `Task: ${task.title || "Untitled task"}`,
         description: [
             task.project?.title ? `Project: ${task.project.title}` : "",
             task.status ? `Status: ${task.status.replace("_", " ")}` : "",
@@ -50,7 +56,7 @@ const buildActivities = (recent = {}) => {
 
     const protocols = (recent.protocols || []).map((protocol) => ({
         id: `protocol-${protocol._id}`,
-        title: `Protocol: ${protocol.title}`,
+        title: `Protocol: ${protocol.title || "Untitled protocol"}`,
         description: `Uploaded by ${formatUser(protocol.uploadedBy)}`,
         time: formatDate(protocol.createdAt),
         createdAt: protocol.createdAt,
