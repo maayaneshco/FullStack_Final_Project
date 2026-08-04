@@ -1,352 +1,516 @@
-# Full Stack Final Project 2026 - LabHub
+# LabHub / Kehat Lab
 
-## Backend Overview
-LabHub is a Full Stack laboratory management system developed as an Advanced Full Stack final project.
-The system is designed for academic research laboratories and provides a centralized platform for managing research projects, laboratory tasks, responsibilities, equipment, inventory, protocol documents, bookings, user authentication, and dashboard statistics.
-This repository contains the complete Backend implementation built with Node.js, Express, MongoDB, and Mongoose.
+LabHub / Kehat Lab is an internal Full Stack laboratory management system for an academic cardiovascular genetics research laboratory. It is intended for authorized lab members and supports day-to-day operational management across research projects, tasks, responsibilities, inventory, equipment, bookings, protocol files, users, and dashboard summaries.
 
-# Features
-* Authentication
-    - User Registration
-    - User Login
-    - JWT Authentication
-    - Password Hashing using bcrypt
-    - Protected Routes
-    - Role-Based Authorization (Admin / Researcher)
+## Project Overview
 
-* User Management
-    - View Profile
-    - Update Profile
-    - Change Password
+LabHub centralizes common laboratory workflows in one protected portal. The application supports:
 
-* Project Management
-    - Create Project
-    - Update Project
-    - Delete Project
-    - View User Projects
-    - Project Members Management
-    - Project Tasks
+- Research projects
+- Lab and project tasks
+- Lab responsibilities
+- Inventory and stock monitoring
+- Equipment records
+- Equipment bookings
+- Protocol file upload and download
+- User profiles and role-based access
+- Dashboard statistics and recent activity
 
-# Task Management
-Supports two task types: Project Tasks and Laboratory Tasks.
+The system is built as an internal academic lab tool. Public access is limited to authentication pages; operational pages require login.
 
-* Features:
-    - Create Tasks
-    - Update Tasks
-    - Delete Tasks
-    - Assign Multiple Users
-    - Update Task Status
-    - Completed Tasks
-    - Overdue Tasks
-    - My Laboratory Tasks
-    -mMy Project Tasks
+## Main Features
 
-# Responsibilities
+### Authentication and Users
 
-* Create Responsibilities
-* Update Responsibilities
-* Soft Delete
-* My Responsibilities
+- Login with email and password
+- Internal registration using a lab access code
+- JWT authentication
+- Password hashing with bcrypt
+- Session restoration after browser refresh
+- Logout
+- Profile update
+- Change password
+- Admin user management
+- Admin and researcher roles
 
+### Projects
 
-# Inventory Management
+- Project list
+- Project details
+- Create, update, and delete according to backend authorization
+- Project ownership and project members
+- Project-related tasks
 
-* Create Inventory Items
-* Update Inventory
-* Soft Delete
-* Low Stock Detection
-* Expired Inventory Detection
+### Tasks
 
-# Equipment Management
+- Lab tasks and project tasks
+- Create, update, and delete tasks
+- Status updates
+- Completed tasks view
+- Overdue tasks view
+- Assignment and due dates
 
-* Equipment CRUD
-* Availability Status
-* Maintenance Status
-* Soft Delete
+### Responsibilities
 
-# Equipment Booking
+- Lab responsibility management
+- My responsibilities view
+- Admin-only create, update, and delete permissions
+- Assigned and backup users
 
-* Create Booking
-* Update Booking
-* Cancel Booking
-* View Equipment Bookings
-* View My Bookings
+### Inventory
 
-# Protocol Library
+- Inventory list
+- Admin-only create, update, and delete
+- Quantity and minimum quantity tracking
+- Low-stock view
+- Expired inventory view
+- Category and stock filtering
 
-* Upload Protocol Files
-* Download Files
-* Search by Title
-* Search by Category
-* Soft Delete
-* Supported File Types: PDF, DOC, DOCX
-* Maximum Upload Size: 10 MB
+### Equipment
 
-# Dashboard API
+- Equipment management
+- Equipment details page
+- Admin-only create, update, and delete
+- Equipment status management
+- Supported statuses: `available`, `maintenance`, `out_of_service`
 
-* Provides summarized laboratory statistics:
-    - Total Projects
-    - Total Tasks
-    - Open Tasks
-    - Completed Tasks
-    - Active Bookings
-    - Available Equipment
-    - Low Stock Items
-    - Expired Inventory
-    - Total Protocols
+### Equipment Bookings
 
-* Includes recent activity lists for:
-    - Projects
-    - Tasks
-    - Bookings
-    - Protocols
+- Create bookings
+- Edit bookings
+- Cancel bookings
+- My bookings view
+- Backend conflict validation for overlapping active bookings
+- Supported statuses: `active`, `cancelled`, `completed`
 
-Dashboard queries are optimized using Promise.all().
+### Protocol Library
 
-# Technology Stack
-* Backend
-    - Node.js
-    - Express.js
+- Upload protocol files
+- Supported formats: PDF, DOC, DOCX
+- Maximum upload size: 10 MB
+- Metadata editing
+- Protected file download
+- Admin-only deletion
+- Uploader/admin update authorization
 
-* Database
-    - MongoDB
-    - Mongoose
+### Dashboard
 
-* Authentication
-    - JWT
-    - bcrypt
+- Real backend statistics
+- Recent projects
+- Recent tasks
+- Recent bookings
+- Recent protocols
+- Loading, error, and zero-value handling
 
-* Security
-    - Helmet
-    - CORS
-    - express-rate-limit
+## Technology Stack
 
-* Validation
-    - Mongoose Validation
-    - Controller Validation
+### Frontend
 
-* File Upload
-    - Multer
+- React 19
+- Vite
+- React Router
+- Redux Toolkit
+- React Redux
+- Axios
+- React Hook Form
+- Tailwind CSS
+- Lucide React
 
+### Backend
 
-# Project Structure
-```
-server/
-│
-├── config/
-├── controllers/
-├── middleware/
-├── models/
-├── routes/
-├── uploads/
-│
-│   └── protocols/
-│
-├── utils/
-│
-├── app.js
-├── server.js
-└── .env
-```
+- Node.js
+- Express
+- MongoDB
+- Mongoose
+- JWT
+- bcrypt
+- Joi dependency installed
+- Multer
+- Helmet
+- CORS
+- express-rate-limit dependency installed
+- dotenv
 
-# Architecture
-The backend follows a simple MVC architecture.
+### Development
 
-```
-Client 
+- ESLint
+- Nodemon
+- Git and GitHub
 
-↓
+## Architecture
 
-Routes
+### Backend
 
-↓
+The backend follows a lightweight MVC structure:
 
-Middleware
+- Models define MongoDB schemas with Mongoose.
+- Controllers contain request handling and business logic.
+- Routes define API endpoints and attach middleware.
+- Middleware handles authentication, role authorization, and protocol upload handling.
+- Utilities and configuration handle JWT generation and MongoDB connection setup.
 
-↓
+There is no separate service layer in the backend.
 
-Controllers
+### Frontend
 
-↓
+The frontend is organized by responsibility:
 
-Models
+- Pages render route-level screens.
+- Components provide reusable UI, dashboard, auth, and layout elements.
+- Services wrap Axios API calls.
+- Redux slices manage module state and async thunks.
+- AuthContext manages authentication state, token storage, logout, login, and session restoration.
+- Routes define public, protected, admin-only, and error views.
+- Layouts separate authentication pages from the internal dashboard shell.
 
-↓
+## Folder Structure
 
-MongoDB
-```
-
-Business logic is implemented inside Controllers.
-
-Routes remain lightweight and only define API endpoints.
-
-
-# Authentication Flow
-
-1. User registers using:
-
-   * First Name
-   * Last Name
-   * Email
-   * Password
-   * Lab Position
-   * Laboratory Access Code
-
-2. Password is hashed using bcrypt.
-
-3. JWT token is generated.
-
-4. Protected endpoints require:
-
-```
-Authorization: Bearer <token>
+```text
+LabHub/
+|-- client/
+|   |-- src/
+|   |   |-- api/
+|   |   |-- assets/
+|   |   |-- components/
+|   |   |-- context/
+|   |   |-- features/
+|   |   |-- hooks/
+|   |   |-- layouts/
+|   |   |-- pages/
+|   |   |-- redux/
+|   |   |-- routes/
+|   |   |-- services/
+|   |   |-- styles/
+|   |   `-- utils/
+|   `-- package.json
+|-- server/
+|   |-- config/
+|   |-- controllers/
+|   |-- middleware/
+|   |-- models/
+|   |-- routes/
+|   |-- uploads/
+|   |-- utils/
+|   |-- validation/
+|   |-- app.js
+|   |-- server.js
+|   `-- package.json
+|-- .gitignore
+`-- README.md
 ```
 
-5. User roles determine authorization level.
+## Prerequisites
 
+- Node.js
+- npm
+- MongoDB local installation or MongoDB Atlas
+- Git
 
-# User Roles
+No specific Node.js version is defined in `package.json`.
 
-* Researcher - Can:
-    - Access laboratory resources
-    - Manage assigned work
-    - Create projects
-    - Create tasks
-    - Upload protocols
-    - Book equipment
+## Environment Variables
 
-* Admin - Has full system access including:
-    - Inventory Management
-    - Equipment Management
-    - Responsibilities Management
-    - User Administration
+Create local `.env` files from the provided examples. Do not commit real secret values.
 
+### Backend
 
-# REST API
-Main endpoints:
-```
-POST   /api/auth/register
-POST   /api/auth/login
-GET    /api/auth/me
+File: `server/.env`
 
-GET    /api/users/profile
-PUT    /api/users/profile
-PUT    /api/users/change-password
-
-GET    /api/projects
-POST   /api/projects
-
-GET    /api/tasks
-
-GET    /api/inventory
-
-GET    /api/equipment
-
-GET    /api/bookings
-
-GET    /api/protocols
-
-GET    /api/dashboard
+```env
+PORT=5000
+MONGO_URI=mongodb://127.0.0.1:27017/labhub
+JWT_SECRET=replace_with_a_secure_secret
+JWT_EXPIRE=7d
+LAB_ACCESS_CODE=replace_with_the_lab_access_code
+CLIENT_URL=http://localhost:5173
 ```
 
-# Environment Variables
-Create a `.env` file containing:
-```
-PORT=
+These variables are used by `server/server.js`, `server/config/db.js`, `server/controllers/authController.js`, `server/middleware/authMiddleware.js`, `server/utils/generateToken.js`, and `server/app.js`.
 
-MONGO_URI=
+### Frontend
 
-JWT_SECRET=
+File: `client/.env`
 
-JWT_EXPIRE=
-
-LAB_ACCESS_CODE=
-
-CLIENT_URL=
+```env
+VITE_API_URL=http://localhost:5000/api
 ```
 
-# Installation
-Clone the repository
+The frontend reads this value in `client/src/api/axiosInstance.js`.
 
-```
-git clone <repository-url>
+## Installation
+
+Clone the repository:
+
+```bash
+git clone https://github.com/maayaneshco/FullStack_Final_Project.git
+cd FullStack_Final_Project
 ```
 
-Install dependencies
+Install and run the backend:
 
-```
+```bash
+cd server
 npm install
-```
-
-Configure environment variables
-
-```
-Create .env
-```
-
-Run development server
-
-```
+# copy .env.example to .env and fill in local values
 npm run dev
 ```
 
-Production
+Install and run the frontend in a second terminal:
 
-```
-npm start
-```
-
-# Security
-
-The backend includes:
-* JWT Authentication
-* Password Hashing (bcrypt)
-* Role-Based Authorization
-* Helmet
-* CORS
-* Rate Limiting
-* Protected Routes
-* Environment Variables
-* Secure File Upload Validation
-
-# Database
-MongoDB collections:
-* Users
-* Projects
-* Tasks
-* Responsibilities
-* Inventory
-* Equipment
-* Bookings
-* Protocols
-
-Relationships are implemented using MongoDB ObjectId references.
-
-# Error Handling
-The API returns consistent JSON responses.
-Example:
-```json
-{
-    "message": "Resource not found"
-}
+```bash
+cd client
+npm install
+# copy .env.example to .env and fill in local values
+npm run dev
 ```
 
-Status Codes:
-* 200 OK
-* 201 Created
-* 400 Bad Request
-* 401 Unauthorized
-* 403 Forbidden
-* 404 Not Found
-* 500 Internal Server Error
+Expected local URLs:
 
-# Future Frontend
-The backend is designed to integrate with a React frontend using:
-* React
-* React Router
-* Context API
-* Redux Toolkit
-* Tailwind CSS
+- Frontend: `http://localhost:5173`
+- Backend: `http://localhost:5000` unless `PORT` is changed
 
-# Author
-* Maayan Eshco 207175761
+## Available Scripts
+
+### Client
+
+- `npm run dev` - start the Vite development server
+- `npm run build` - create a production build
+- `npm run lint` - run ESLint
+- `npm run preview` - preview the production build locally
+
+### Server
+
+- `npm run dev` - start the backend with Nodemon
+- `npm start` - start the backend with Node
+
+## User Roles and Authorization
+
+| Role | Permissions |
+| --- | --- |
+| Admin | User management, inventory management, equipment management, responsibility management, protocol deletion, and administrative actions allowed by backend ownership and role checks. |
+| Researcher | Use research modules, create projects, manage owned projects, create allowed tasks, create bookings, upload protocols, update own uploaded protocols, and read protected lab resources where permitted. |
+
+The backend is the final authority for authorization. The frontend hides restricted controls where appropriate, but protected API routes and controller checks enforce access.
+
+## Frontend Routes
+
+### Public
+
+- `/`
+- `/login`
+- `/register`
+
+### Protected
+
+- `/dashboard`
+- `/projects`
+- `/projects/:id`
+- `/tasks`
+- `/tasks/completed`
+- `/tasks/overdue`
+- `/responsibilities`
+- `/responsibilities/my`
+- `/inventory`
+- `/inventory/low-stock`
+- `/inventory/expired`
+- `/equipment`
+- `/equipment/:id`
+- `/bookings`
+- `/bookings/my`
+- `/protocols`
+- `/profile`
+- `/change-password`
+
+### Admin-only
+
+- `/users`
+
+### Error Routes
+
+- `/401`
+- `*` wildcard route for Not Found
+
+## API Overview
+
+All protected routes expect an `Authorization: Bearer <token>` header.
+
+### Auth: `/api/auth`
+
+- `POST /register`
+- `POST /login`
+- `GET /me`
+
+### Users: `/api/users`
+
+- `GET /` - admin-only users list
+- `GET /profile`
+- `PUT /profile`
+- `PUT /change-password`
+- `PUT /:id/role` - admin-only role update
+
+### Dashboard: `/api/dashboard`
+
+- `GET /` - protected dashboard summary and recent activity
+
+### Projects: `/api/projects`
+
+- `GET /`
+- `POST /`
+- `GET /:id/tasks`
+- `GET /:id`
+- `PUT /:id`
+- `DELETE /:id`
+- `POST /:id/members`
+- `DELETE /:id/members/:userId`
+
+Project update, delete, and member-management actions are restricted by owner/admin checks in the controller.
+
+### Tasks: `/api/tasks`
+
+- `POST /`
+- `GET /lab`
+- `GET /my-project-tasks`
+- `GET /my-lab-tasks`
+- `GET /overdue`
+- `GET /completed`
+- `GET /:id`
+- `PUT /:id`
+- `PUT /:id/status`
+- `DELETE /:id`
+
+Task permissions depend on role, project ownership, project membership, assignment, and task type.
+
+### Responsibilities: `/api/responsibilities`
+
+- `GET /`
+- `GET /my`
+- `GET /:id`
+- `POST /` - admin-only
+- `PUT /:id` - admin-only
+- `DELETE /:id` - admin-only soft delete
+
+### Inventory: `/api/inventory`
+
+- `GET /`
+- `GET /low-stock`
+- `GET /expired`
+- `GET /:id`
+- `POST /` - admin-only
+- `PUT /:id` - admin-only
+- `DELETE /:id` - admin-only soft delete
+
+### Equipment: `/api/equipment`
+
+- `GET /`
+- `GET /:id`
+- `POST /` - admin-only
+- `PUT /:id` - admin-only
+- `DELETE /:id` - admin-only soft delete
+
+### Bookings: `/api/bookings`
+
+- `GET /`
+- `GET /my-bookings`
+- `GET /equipment/:equipmentId`
+- `POST /`
+- `PUT /:id`
+- `PUT /:id/cancel`
+
+Booking update and cancellation are allowed for admins or the user who created the booking.
+
+### Protocols: `/api/protocols`
+
+- `GET /`
+- `POST /`
+- `GET /:id`
+- `PUT /:id`
+- `GET /:id/download`
+- `DELETE /:id` - admin-only soft delete
+
+Protocol metadata updates are allowed for admins or the user who uploaded the protocol.
+
+## File Uploads
+
+Protocol uploads use Multer in `server/middleware/protocolUpload.js`.
+
+- Upload endpoint: `POST /api/protocols`
+- Multipart field name: `file`
+- Allowed MIME types:
+  - `application/pdf`
+  - `application/msword`
+  - `application/vnd.openxmlformats-officedocument.wordprocessingml.document`
+- Maximum size: 10 MB
+- Storage directory: `server/uploads/protocols`
+- Download endpoint: `GET /api/protocols/:id/download`
+
+Protocol downloads are protected and use the stored server file path.
+
+## Security
+
+Implemented security measures include:
+
+- Password hashing with bcrypt
+- JWT authentication
+- Protected API routes with authentication middleware
+- Role-based authorization middleware
+- Backend ownership checks for projects, tasks, bookings, and protocols
+- Helmet security headers
+- CORS configured with `CLIENT_URL`
+- Environment variables for secrets and environment-specific configuration
+- Multer file type and size validation for protocol uploads
+- User list and profile endpoints exclude password fields
+
+## Validation and Error Handling
+
+- Frontend forms include practical validation for required fields, email format, passwords, file type, file size, and simple date/time rules.
+- Backend validation is handled through Mongoose schemas and controller-level checks.
+- API errors are returned as JSON messages and displayed in the frontend pages.
+- Data pages include loading, error, and empty states.
+
+## Quality Checks
+
+The frontend supports:
+
+```bash
+npm run lint
+npm run build
+```
+
+The backend has no automated test script in `server/package.json`. Backend endpoints were manually verified during development using Postman.
+
+## Deployment
+
+Deployment is planned separately and may include:
+
+- Frontend hosting
+- Backend hosting
+- MongoDB Atlas
+
+Deployment configuration is not included in the current academic submission. No live deployment URL is provided.
+
+## Known Limitations
+
+- No automated backend test suite is currently configured.
+- No refresh-token implementation is currently included.
+- Protocol uploads depend on server file storage.
+- Deployment may require persistent file storage adjustments for uploaded protocols.
+- Vite may show a large frontend bundle warning during production builds.
+- `express-rate-limit` is installed but no active rate limiter is currently wired in `server/app.js`.
+
+## Future Improvements
+
+- Automated frontend and backend tests
+- Cloud file storage for protocols
+- Notifications
+- Advanced search and pagination
+- Analytics and reporting
+
+These improvements are not part of the current submission scope.
+
+## Academic Context
+
+This project was developed as an Advanced Full Stack final project.
+
+## License
+
+This project was developed for academic purposes.
