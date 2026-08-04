@@ -543,54 +543,43 @@ The backend has no automated test script in `server/package.json`. Backend endpo
 
 ## Deployment
 
-Deployment is planned separately. The intended deployment plan is:
+The project is deployed and available for academic review.
 
-- Frontend: Vercel
-- Backend: Render Web Service
-- Database: MongoDB Atlas
+- Live Application: https://full-stack-final-project-alpha.vercel.app
+- Backend API: https://labhub-backend-q124.onrender.com/api
+- Health Check: https://labhub-backend-q124.onrender.com/api/health
 
-No deployment has been performed from this repository preparation step, and no live deployment URL is provided.
+- Frontend hosting: Vercel
+- Backend hosting: Render
+- Database hosting: MongoDB Atlas
 
-### Deployment Order
+Render Free instances may require a short cold-start delay before the first backend request responds. Protocol files currently use Render local filesystem storage, so uploaded protocol files may not persist after a Render service restart or redeployment unless persistent or cloud file storage is added later.
 
-1. Create and configure MongoDB Atlas.
-2. Deploy the Render backend.
-3. Set the frontend `VITE_API_URL` to the Render backend API URL.
-4. Deploy the Vercel frontend.
-5. Update Render `CLIENT_URL` to the final Vercel frontend URL.
-6. Redeploy/retest backend and frontend.
-7. Run the demo seed intentionally against Atlas if demo data is needed.
+### Deployment Configuration
 
 ### MongoDB Atlas
 
-1. Create a MongoDB Atlas cluster and database.
-2. Create a database user.
-3. Configure Network Access for the Render environment.
-4. Copy the Atlas connection string.
-5. Set Render's `MONGO_URI` environment variable to that connection string.
-6. Do not commit database credentials to the repository.
+MongoDB Atlas stores the production/demo database. Atlas connection strings, database passwords, and generated credentials must be set only in the deployment environment and must not be committed to the repository.
 
-If seeding Atlas intentionally, set `ALLOW_REMOTE_SEED=true` temporarily in the backend environment and run:
+For local demo data, run:
 
 ```bash
 cd server
 npm run seed:demo
 ```
 
-Do not run the seed automatically on server startup.
+For an intentional remote demo seed against Atlas, temporarily set `ALLOW_REMOTE_SEED=true` in the backend environment and run the seed manually. The seed never runs automatically during server startup. Seeded demonstration account passwords come from `SEED_USER_PASSWORD`, and the fictional demo researchers are demonstration data for submission/testing only.
 
 ### Render Backend
 
-Create a Render Web Service using the GitHub repository.
-
-Recommended settings:
+The backend is hosted as a Render Web Service.
 
 - Root Directory: `server`
 - Build Command: `npm install`
 - Start Command: `npm start`
 - Health Check Path: `/api/health`
 
-Required Render environment variables:
+Required Render environment variables are configured in Render, not committed:
 
 ```env
 NODE_ENV=production
@@ -599,20 +588,18 @@ MONGO_URI=<mongodb-atlas-connection-string>
 JWT_SECRET=<secure-production-secret>
 JWT_EXPIRE=7d
 LAB_ACCESS_CODE=<secure-lab-access-code>
-CLIENT_URL=<local-or-vercel-frontend-url>
+CLIENT_URL=https://full-stack-final-project-alpha.vercel.app
 SEED_USER_PASSWORD=<demo-password-if-seeding>
 ALLOW_REMOTE_SEED=false
 ```
 
 Render provides `PORT` at runtime. The backend already uses `process.env.PORT || 5000` and listens on `0.0.0.0`.
 
-`CLIENT_URL` may contain one URL or a comma-separated list, for example local Vite plus the final Vercel URL during testing.
+`CLIENT_URL` may contain one URL or a comma-separated list, for example local Vite plus the final Vercel URL during testing. The backend exposes `GET /api/health` for Render health checks and deployment verification.
 
 ### Vercel Frontend
 
-Import the GitHub repository into Vercel.
-
-Recommended settings:
+The frontend is hosted on Vercel.
 
 - Root Directory: `client`
 - Framework Preset: Vite
@@ -623,7 +610,7 @@ Recommended settings:
 Required Vercel environment variable:
 
 ```env
-VITE_API_URL=https://<render-backend-domain>/api
+VITE_API_URL=https://labhub-backend-q124.onrender.com/api
 ```
 
 The frontend includes `client/vercel.json` with a rewrite to `/index.html` so React Router routes such as `/dashboard`, `/projects`, `/tasks`, and `/users` work on direct navigation and browser refresh.
