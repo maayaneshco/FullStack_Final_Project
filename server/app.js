@@ -18,19 +18,45 @@ const dashboardRoutes = require("./routes/dashboardRoutes");
 
 const app = express();
 
+const defaultClientUrls = [
+  "http://localhost:5173",
+];
+
+const allowedOrigins = [
+  ...defaultClientUrls,
+  ...(process.env.CLIENT_URL || "")
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean),
+];
+
 // Security middleware - adds secure HTTP headers
 app.use(helmet());
 
 // Allow requests from the frontend application
 app.use(
   cors({
-    origin: process.env.CLIENT_URL,
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+        return;
+      }
+
+      callback(new Error("Not allowed by CORS"));
+    },
     credentials: true,
   })
 );
 
 // Parse incoming JSON requests
 app.use(express.json());
+
+// Public health check for deployment platforms
+app.get("/api/health", (req, res) => {
+  res.status(200).json({
+    status: "ok",
+  });
+});
 
 // Authentication routes
 app.use("/api/auth", authRoutes);

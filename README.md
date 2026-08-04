@@ -217,6 +217,7 @@ Create local `.env` files from the provided examples. Do not commit real secret 
 File: `server/.env`
 
 ```env
+NODE_ENV=production
 PORT=5000
 MONGO_URI=mongodb://127.0.0.1:27017/labhub
 JWT_SECRET=replace_with_a_secure_secret
@@ -224,6 +225,7 @@ JWT_EXPIRE=7d
 LAB_ACCESS_CODE=replace_with_the_lab_access_code
 CLIENT_URL=http://localhost:5173
 SEED_USER_PASSWORD=LabHubDemo123!
+ALLOW_REMOTE_SEED=false
 ```
 
 These variables are used by `server/server.js`, `server/config/db.js`, `server/controllers/authController.js`, `server/middleware/authMiddleware.js`, `server/utils/generateToken.js`, and `server/app.js`.
@@ -236,7 +238,7 @@ File: `client/.env`
 VITE_API_URL=http://localhost:5000/api
 ```
 
-The frontend reads this value in `client/src/api/axiosInstance.js`.
+The frontend reads this value in `client/src/api/axiosInstance.js`. For deployment, set it to the Render backend API base URL, for example `https://<render-backend-domain>/api`.
 
 ## Installation
 
@@ -407,6 +409,10 @@ All protected routes expect an `Authorization: Bearer <token>` header.
 
 - `GET /` - protected dashboard summary and recent activity
 
+### Health: `/api/health`
+
+- `GET /` - public health check returning `{ "status": "ok" }`
+
 ### Projects: `/api/projects`
 
 - `GET /`
@@ -500,6 +506,8 @@ Protocol uploads use Multer in `server/middleware/protocolUpload.js`.
 
 Protocol downloads are protected and use the stored server file path.
 
+On Render, local filesystem storage may be ephemeral. Uploads continue to work with the current local storage implementation, but uploaded protocol files may not persist across service restarts or redeployments unless persistent/cloud storage is added later.
+
 ## Security
 
 Implemented security measures include:
@@ -535,13 +543,90 @@ The backend has no automated test script in `server/package.json`. Backend endpo
 
 ## Deployment
 
-Deployment is planned separately and may include:
+Deployment is planned separately. The intended deployment plan is:
 
-- Frontend hosting
-- Backend hosting
-- MongoDB Atlas
+- Frontend: Vercel
+- Backend: Render Web Service
+- Database: MongoDB Atlas
 
-Deployment configuration is not included in the current academic submission. No live deployment URL is provided.
+No deployment has been performed from this repository preparation step, and no live deployment URL is provided.
+
+### Deployment Order
+
+1. Create and configure MongoDB Atlas.
+2. Deploy the Render backend.
+3. Set the frontend `VITE_API_URL` to the Render backend API URL.
+4. Deploy the Vercel frontend.
+5. Update Render `CLIENT_URL` to the final Vercel frontend URL.
+6. Redeploy/retest backend and frontend.
+7. Run the demo seed intentionally against Atlas if demo data is needed.
+
+### MongoDB Atlas
+
+1. Create a MongoDB Atlas cluster and database.
+2. Create a database user.
+3. Configure Network Access for the Render environment.
+4. Copy the Atlas connection string.
+5. Set Render's `MONGO_URI` environment variable to that connection string.
+6. Do not commit database credentials to the repository.
+
+If seeding Atlas intentionally, set `ALLOW_REMOTE_SEED=true` temporarily in the backend environment and run:
+
+```bash
+cd server
+npm run seed:demo
+```
+
+Do not run the seed automatically on server startup.
+
+### Render Backend
+
+Create a Render Web Service using the GitHub repository.
+
+Recommended settings:
+
+- Root Directory: `server`
+- Build Command: `npm install`
+- Start Command: `npm start`
+- Health Check Path: `/api/health`
+
+Required Render environment variables:
+
+```env
+NODE_ENV=production
+PORT=5000
+MONGO_URI=<mongodb-atlas-connection-string>
+JWT_SECRET=<secure-production-secret>
+JWT_EXPIRE=7d
+LAB_ACCESS_CODE=<secure-lab-access-code>
+CLIENT_URL=<local-or-vercel-frontend-url>
+SEED_USER_PASSWORD=<demo-password-if-seeding>
+ALLOW_REMOTE_SEED=false
+```
+
+Render provides `PORT` at runtime. The backend already uses `process.env.PORT || 5000` and listens on `0.0.0.0`.
+
+`CLIENT_URL` may contain one URL or a comma-separated list, for example local Vite plus the final Vercel URL during testing.
+
+### Vercel Frontend
+
+Import the GitHub repository into Vercel.
+
+Recommended settings:
+
+- Root Directory: `client`
+- Framework Preset: Vite
+- Install Command: `npm install`
+- Build Command: `npm run build`
+- Output Directory: `dist`
+
+Required Vercel environment variable:
+
+```env
+VITE_API_URL=https://<render-backend-domain>/api
+```
+
+The frontend includes `client/vercel.json` with a rewrite to `/index.html` so React Router routes such as `/dashboard`, `/projects`, `/tasks`, and `/users` work on direct navigation and browser refresh.
 
 ## Known Limitations
 
