@@ -223,6 +223,7 @@ JWT_SECRET=replace_with_a_secure_secret
 JWT_EXPIRE=7d
 LAB_ACCESS_CODE=replace_with_the_lab_access_code
 CLIENT_URL=http://localhost:5173
+SEED_USER_PASSWORD=LabHubDemo123!
 ```
 
 These variables are used by `server/server.js`, `server/config/db.js`, `server/controllers/authController.js`, `server/middleware/authMiddleware.js`, `server/utils/generateToken.js`, and `server/app.js`.
@@ -269,6 +270,58 @@ Expected local URLs:
 - Frontend: `http://localhost:5173`
 - Backend: `http://localhost:5000` unless `PORT` is changed
 
+## Demo Data
+
+The backend includes an explicit seed script for preparing a realistic academic demonstration dataset. It is not connected to `app.js`, `server.js`, `npm start`, or `npm run dev`; it runs only when called intentionally.
+
+From the backend folder:
+
+```bash
+cd server
+npm run seed:demo
+```
+
+Optional cleanup for this seed's known demo records:
+
+```bash
+npm run seed:demo:clean
+```
+
+The seed uses `SEED_USER_PASSWORD` for all seeded user accounts. If the variable is not set, the script uses the documented development-only fallback:
+
+```text
+LabHubDemo123!
+```
+
+The seed is idempotent. It uses stable user emails, project titles, task titles, inventory names, equipment names, booking purposes, and protocol titles to update existing demo records instead of creating duplicates. It does not wipe the database and does not call generic collection resets such as `deleteMany({})`.
+
+The seed always searches for and removes only the clearly identified test user whose visible name is `TEST MEMBER`.
+
+Seeded accounts include:
+
+| Name | Role | Lab position | Notes |
+| --- | --- | --- | --- |
+| Izhak Kehat | admin | `principal_investigator` | Project-owner-directed principal investigator account. |
+| Shelly Marienberg | researcher | `md_phd_student` | Existing user is updated if present instead of duplicated. |
+| Noa Ben-David | researcher | `researcher` | Fictional demonstration user. |
+| Amir Cohen | researcher | `md_student` | Fictional demonstration user. |
+| Yael Levi | researcher | `lab_manager` | Fictional demonstration user. |
+| Daniel Rosen | researcher | `lab_technician` | Fictional demonstration user. |
+| Maya Stein | researcher | `undergraduate_research_assistant` | Fictional demonstration user. |
+| Eitan Barak | researcher | `other` | Fictional demonstration user. |
+
+Seeded demo content includes:
+
+- 4 projects
+- 16 tasks
+- 6 responsibilities
+- 12 inventory items
+- 7 equipment records
+- 7 bookings
+- 4 protocol records with local demonstration PDF files
+
+For safety, the seed refuses to run against a non-local MongoDB host unless `ALLOW_REMOTE_SEED=true` is set intentionally. Deployment databases should be seeded manually and deliberately, not automatically during server startup.
+
 ## Available Scripts
 
 ### Client
@@ -282,6 +335,8 @@ Expected local URLs:
 
 - `npm run dev` - start the backend with Nodemon
 - `npm start` - start the backend with Node
+- `npm run seed:demo` - seed realistic demo data intentionally
+- `npm run seed:demo:clean` - remove only this seed's known demo records
 
 ## User Roles and Authorization
 
