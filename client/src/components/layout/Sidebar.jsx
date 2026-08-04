@@ -39,11 +39,20 @@ const navigationItems = [
         label: "Profile",
         path: "/profile",
     },
+    {
+        label: "Users",
+        path: "/users",
+        roles: ["admin"],
+    },
 ];
 
 const Sidebar = () => {
-    const { logout } = useAuth();
+    const { logout, user } = useAuth();
     const navigate = useNavigate();
+
+    const visibleNavigationItems = navigationItems.filter((item) => {
+        return !item.roles || item.roles.includes(user?.role);
+    });
 
     const handleLogout = () => {
         logout();
@@ -64,7 +73,7 @@ const Sidebar = () => {
 
             <nav className="min-h-0 flex-1 overflow-y-auto px-4 py-6">
                 <ul className="space-y-2">
-                    {navigationItems.map((item) => (
+                    {visibleNavigationItems.map((item) => (
                         <li key={item.path}>
                             <NavLink
                                 to={item.path}

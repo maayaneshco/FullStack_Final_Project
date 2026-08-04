@@ -73,6 +73,14 @@ const getUserName = (user) => {
     return [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email;
 };
 
+const getEntityId = (entity) => {
+    if (!entity) {
+        return "";
+    }
+
+    return typeof entity === "string" ? entity : entity._id;
+};
+
 const buildFormState = (protocol) => ({
     title: protocol?.title || "",
     description: protocol?.description || "",
@@ -96,6 +104,9 @@ const ProtocolsPage = () => {
     const [downloadError, setDownloadError] = useState("");
 
     const isAdmin = user?.role === "admin";
+    const canManageProtocol = (protocol) => {
+        return isAdmin || getEntityId(protocol.uploadedBy) === user?._id;
+    };
 
     const fetchFilters = useMemo(
         () => ({
@@ -463,24 +474,32 @@ const ProtocolsPage = () => {
                                     >
                                         <Download size={16} />
                                     </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => openEditForm(protocol)}
-                                        className="rounded-xl border border-[var(--color-border)] p-2 text-[var(--color-text-secondary)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]"
-                                        aria-label={`Edit ${protocol.title}`}
-                                    >
-                                        <Edit3 size={16} />
-                                    </button>
-                                    {isAdmin && (
-                                        <button
-                                            type="button"
-                                            onClick={() => handleDelete(protocol)}
-                                            disabled={actionLoading}
-                                            className="rounded-xl border border-[var(--color-border)] p-2 text-[var(--color-danger)] hover:border-[var(--color-danger)] disabled:opacity-60"
-                                            aria-label={`Delete ${protocol.title}`}
-                                        >
-                                            <Trash2 size={16} />
-                                        </button>
+                                    {canManageProtocol(protocol) && (
+                                        <>
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    openEditForm(protocol)
+                                                }
+                                                className="rounded-xl border border-[var(--color-border)] p-2 text-[var(--color-text-secondary)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]"
+                                                aria-label={`Edit ${protocol.title}`}
+                                            >
+                                                <Edit3 size={16} />
+                                            </button>
+                                            {isAdmin && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        handleDelete(protocol)
+                                                    }
+                                                    disabled={actionLoading}
+                                                    className="rounded-xl border border-[var(--color-border)] p-2 text-[var(--color-danger)] hover:border-[var(--color-danger)] disabled:opacity-60"
+                                                    aria-label={`Delete ${protocol.title}`}
+                                                >
+                                                    <Trash2 size={16} />
+                                                </button>
+                                            )}
+                                        </>
                                     )}
                                 </div>
                             </div>

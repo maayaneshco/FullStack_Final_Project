@@ -4,6 +4,7 @@ import { Edit3, FolderKanban, Plus, Trash2, X } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { Button, Card, Input } from "../../components/ui";
+import { useAuth } from "../../context";
 import {
     clearProjectErrors,
     createProject,
@@ -45,8 +46,17 @@ const toDateInputValue = (value) => {
     return new Date(value).toISOString().slice(0, 10);
 };
 
+const getEntityId = (entity) => {
+    if (!entity) {
+        return "";
+    }
+
+    return typeof entity === "string" ? entity : entity._id;
+};
+
 const ProjectsPage = () => {
     const dispatch = useDispatch();
+    const { user } = useAuth();
 
     const { projects, loading, error, actionLoading, actionError } =
         useSelector((state) => state.projects);
@@ -72,6 +82,10 @@ const ProjectsPage = () => {
 
         return projects.filter((project) => project.status === statusFilter);
     }, [projects, statusFilter]);
+
+    const canManageProject = (project) => {
+        return user?.role === "admin" || getEntityId(project.owner) === user?._id;
+    };
 
     const openCreateForm = () => {
         setEditingProject(null);
@@ -386,25 +400,27 @@ const ProjectsPage = () => {
                                     </p>
                                 </div>
 
-                                <div className="flex shrink-0 gap-2">
-                                    <button
-                                        type="button"
-                                        onClick={() => openEditForm(project)}
-                                        className="rounded-xl border border-[var(--color-border)] p-2 text-[var(--color-text-secondary)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]"
-                                        aria-label={`Edit ${project.title}`}
-                                    >
-                                        <Edit3 size={16} />
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => handleDelete(project)}
-                                        disabled={actionLoading}
-                                        className="rounded-xl border border-[var(--color-border)] p-2 text-[var(--color-danger)] hover:border-[var(--color-danger)] disabled:opacity-60"
-                                        aria-label={`Delete ${project.title}`}
-                                    >
-                                        <Trash2 size={16} />
-                                    </button>
-                                </div>
+                                {canManageProject(project) && (
+                                    <div className="flex shrink-0 gap-2">
+                                        <button
+                                            type="button"
+                                            onClick={() => openEditForm(project)}
+                                            className="rounded-xl border border-[var(--color-border)] p-2 text-[var(--color-text-secondary)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]"
+                                            aria-label={`Edit ${project.title}`}
+                                        >
+                                            <Edit3 size={16} />
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => handleDelete(project)}
+                                            disabled={actionLoading}
+                                            className="rounded-xl border border-[var(--color-border)] p-2 text-[var(--color-danger)] hover:border-[var(--color-danger)] disabled:opacity-60"
+                                            aria-label={`Delete ${project.title}`}
+                                        >
+                                            <Trash2 size={16} />
+                                        </button>
+                                    </div>
+                                )}
                             </div>
 
                             <div className="flex flex-wrap gap-2 text-xs font-semibold uppercase tracking-wide">

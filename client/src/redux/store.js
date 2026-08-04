@@ -8,6 +8,7 @@ import inventoryReducer from "./slices/inventorySlice";
 import equipmentReducer from "./slices/equipmentSlice";
 import bookingReducer from "./slices/bookingSlice";
 import protocolReducer from "./slices/protocolSlice";
+import userManagementReducer from "./slices/userManagementSlice";
 
 const store = configureStore({
     reducer: {
@@ -19,6 +20,7 @@ const store = configureStore({
         equipment: equipmentReducer,
         bookings: bookingReducer,
         protocols: protocolReducer,
+        userManagement: userManagementReducer,
     },
 });
 

@@ -4,6 +4,7 @@ import AuthLayout from "../layouts/AuthLayout";
 import DashboardLayout from "../layouts/DashboardLayout";
 
 import ProtectedRoute from "../components/common/ProtectedRoute";
+import RoleRoute from "../components/common/RoleRoute";
 
 import {
     LoginPage,
@@ -46,7 +47,9 @@ const AppRouter = () => {
                 <Route element={<DashboardLayout />}>
                     <Route path="dashboard" element={<DashboardPage />} />
 
-                    <Route path="users" element={<UsersPage />} />
+                    <Route element={<RoleRoute allowedRoles={["admin"]} />}>
+                        <Route path="users" element={<UsersPage />} />
+                    </Route>
 
                     <Route path="profile" element={<ProfilePage />} />
 

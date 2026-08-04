@@ -1,6 +1,8 @@
 const User = require("../models/User");
 const generateToken = require("../utils/generateToken");
 
+const allowedRoles = ["researcher", "admin"];
+
 // Return the currently logged-in user's profile
 const getProfile = async (req, res) => {
   res.status(200).json(req.user);
@@ -94,8 +96,74 @@ const changePassword = async (req, res) => {
   }
 };
 
+// Return all users for admin user management
+const getUsers = async (req, res) => {
+  try {
+    const users = await User.find({})
+      .select("-password")
+      .sort({
+        lastName: 1,
+        firstName: 1,
+      });
+
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
+// Update a user's role from the admin user management screen
+const updateUserRole = async (req, res) => {
+  try {
+    const { role } = req.body;
+
+    if (!allowedRoles.includes(role)) {
+      return res.status(400).json({
+        message: "Invalid role",
+      });
+    }
+
+    if (req.params.id === req.user._id.toString()) {
+      return res.status(400).json({
+        message: "Admins cannot change their own role",
+      });
+    }
+
+    const user = await User.findById(req.params.id);
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    user.role = role;
+
+    const updatedUser = await user.save();
+
+    res.status(200).json({
+      _id: updatedUser._id,
+      firstName: updatedUser.firstName,
+      lastName: updatedUser.lastName,
+      email: updatedUser.email,
+      role: updatedUser.role,
+      labPosition: updatedUser.labPosition,
+      createdAt: updatedUser.createdAt,
+      updatedAt: updatedUser.updatedAt,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   getProfile,
   updateProfile,
   changePassword,
+  getUsers,
+  updateUserRole,
 };

@@ -160,6 +160,16 @@ const updateProtocol = async (req, res) => {
             });
         }
 
+        const isAdmin = req.user.role === "admin";
+        const isUploader =
+            protocol.uploadedBy.toString() === req.user._id.toString();
+
+        if (!isAdmin && !isUploader) {
+            return res.status(403).json({
+                message: "Not authorized to update this protocol",
+            });
+        }
+
         // Check for duplicate title
         if (
             title &&

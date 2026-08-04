@@ -18,10 +18,25 @@ const changePassword = async (passwordData) => {
     return response.data;
 };
 
+const getUsers = async () => {
+    const response = await axiosInstance.get("/users");
+    return response.data;
+};
+
+const updateUserRole = async ({ userId, role }) => {
+    const response = await axiosInstance.put(`/users/${userId}/role`, {
+        role,
+    });
+
+    return response.data;
+};
+
 const userService = {
     getProfile,
     updateProfile,
     changePassword,
+    getUsers,
+    updateUserRole,
 };
 
 export default userService;
